@@ -16,7 +16,7 @@ print("\nMissing Values:")
 print(df.isnull().sum())
 
 # ==============================
-# 2. DATA CLEANING (Downloaded messy data +5)
+# 2. DATA CLEANING (Downloaded messy data )
 # ==============================
 
 # Drop duplicate rows
@@ -54,7 +54,7 @@ print("\nSummary Statistics:")
 print(summary_stats)
 
 # ==============================
-# 4. ADVANCED STATISTICAL ANALYSIS (+5)
+# 4. ADVANCED STATISTICAL ANALYSIS 
 # ==============================
 
 advanced_stats = {}
@@ -74,7 +74,7 @@ print("\nAdvanced Statistical Analysis:")
 print(advanced_stats_df)
 
 # ==============================
-# 5. ANOMALY DETECTION (Data Science +15)
+# 5. ANOMALY DETECTION (Data Science )
 # ==============================
 
 anomalies = {}
