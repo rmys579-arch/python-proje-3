@@ -1,0 +1,8 @@
+# ==============================
+# 7. DATA EXPORT (For P2 & P3 compatibility)
+# ==============================
+
+df.to_csv("cleaned_dataset.csv", index=False)
+advanced_stats_df.to_csv("advanced_statistics.csv")
+
+print("\nAnalysis completed successfully.")

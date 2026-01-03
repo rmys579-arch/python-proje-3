@@ -1,117 +1,57 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import statistics as stats
 
-# ==============================
-# 1. DATASET LOADING (Messy Downloaded Data)
-# ==============================
+# =============================================================
+# 1. DATASET LOADING (Handling Messy Data +5)
+# =============================================================
+try:
+    # sep=None and engine='python' automatically detects commas or semicolons
+    df = pd.read_csv("dataset.csv", sep=None, engine='python', on_bad_lines='skip')
+    print("Dataset loaded successfully.")
+except Exception as e:
+    print(f"Error loading CSV: {e}")
+    exit()
 
-# Example: downloaded CSV file with missing values and inconsistent data
-df = pd.read_csv("dataset.csv")
-
-print("Initial Dataset Info:")
-print(df.info())
-print("\nMissing Values:")
-print(df.isnull().sum())
-
-# ==============================
-# 2. DATA CLEANING (Downloaded messy data )
-# ==============================
-
-# Drop duplicate rows
+# =============================================================
+# 2. DATA CLEANING (Robust Cleaning)
+# =============================================================
 df = df.drop_duplicates()
 
-# Handle missing values
-# Numerical columns -> fill with median
-numeric_columns = df.select_dtypes(include=["int64", "float64"]).columns
+# Categorical columns imputation
+cat_cols = df.select_dtypes(include=["object"]).columns
+for col in cat_cols:
+    mode_val = df[col].mode()
+    df[col] = df[col].fillna(mode_val[0] if not mode_val.empty else "Unknown")
 
-for col in numeric_columns:
+# Numerical columns imputation
+num_cols = df.select_dtypes(include=["int64", "float64"]).columns
+for col in num_cols:
     df[col] = df[col].fillna(df[col].median())
+    df[col] = df[col].abs() # Ensure positive values where needed
 
-# Categorical columns -> fill with mode
-categorical_columns = df.select_dtypes(include=["object"]).columns
-
-for col in categorical_columns:
-    df[col] = df[col].fillna(df[col].mode()[0])
-
-# Fix negative values if they should not exist
-for col in numeric_columns:
-    df[col] = df[col].apply(lambda x: abs(x))
-
-print("\nCleaned Dataset Info:")
-print(df.info())
-
-# ==============================
-# 3. SIMPLE AGGREGATIONS (Baseline)
-# ==============================
-
-summary_stats = df[numeric_columns].agg(
-    ["mean", "min", "max", "sum"]
-)
-
-print("\nSummary Statistics:")
-print(summary_stats)
-
-# ==============================
-# 4. ADVANCED STATISTICAL ANALYSIS 
-# ==============================
-
+# =============================================================
+# 3. DATA SCIENCE & ANOMALY DETECTION (+15)
+# =============================================================
 advanced_stats = {}
-
-for col in numeric_columns:
-    advanced_stats[col] = {
-        "mean": stats.mean(df[col]),
-        "median": stats.median(df[col]),
-        "std_dev": stats.stdev(df[col]),
-        "Q1": df[col].quantile(0.25),
-        "Q3": df[col].quantile(0.75),
-        "IQR": df[col].quantile(0.75) - df[col].quantile(0.25)
-    }
-
-advanced_stats_df = pd.DataFrame(advanced_stats).T
-print("\nAdvanced Statistical Analysis:")
-print(advanced_stats_df)
-
-# ==============================
-# 5. ANOMALY DETECTION (Data Science )
-# ==============================
-
-anomalies = {}
-
-for col in numeric_columns:
+for col in num_cols:
     Q1 = df[col].quantile(0.25)
     Q3 = df[col].quantile(0.75)
     IQR = Q3 - Q1
+    
+    advanced_stats[col] = {
+        "Mean": df[col].mean(),
+        "Median": df[col].median(),
+        "Std_Dev": df[col].std(),
+        "IQR": IQR,
+        "Anomalies": df[(df[col] < (Q1 - 1.5 * IQR)) | (df[col] > (Q3 + 1.5 * IQR))].shape[0]
+    }
 
-    lower_bound = Q1 - 1.5 * IQR
-    upper_bound = Q3 + 1.5 * IQR
+advanced_stats_df = pd.DataFrame(advanced_stats).T
 
-    anomaly_rows = df[(df[col] < lower_bound) | (df[col] > upper_bound)]
-    anomalies[col] = anomaly_rows.shape[0]
-
-print("\nAnomaly Detection Results:")
-for key, value in anomalies.items():
-    print(f"{key}: {value} potential anomalies detected")
-
-# ==============================
-# 6. BASIC VISUALIZATION (Matplotlib baseline)
-# ==============================
-
-# Boxplot for anomaly visualization
-plt.figure()
-df[numeric_columns].boxplot()
-plt.title("Boxplot for Numerical Features")
-plt.xlabel("Features")
-plt.ylabel("Values")
-plt.tight_layout()
-plt.show()
-
-# ==============================
-# 7. DATA EXPORT (For P2 & P3 compatibility)
-# ==============================
-
+# =============================================================
+# 4. EXPORT FOR PERSON 2
+# =============================================================
 df.to_csv("cleaned_dataset.csv", index=False)
 advanced_stats_df.to_csv("advanced_statistics.csv")
-
-print("\nAnalysis completed successfully.")
+print("Analysis completed. 'cleaned_dataset.csv' created.")
