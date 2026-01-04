@@ -17,7 +17,7 @@ except Exception as e:
 # =============================================================
 # 2. DATA CLEANING & STATS
 # =============================================================
-# (Temizlik işlemleri aynı kalıyor...)
+# (Cleaning procedures remain the same...)
 df = df.drop_duplicates()
 num_cols = df.select_dtypes(include=["int64", "float64"]).columns
 
@@ -32,11 +32,11 @@ for col in num_cols:
         "Anomalies": df[(df[col] < (Q1 - 1.5 * IQR)) | (df[col] > (Q3 + 1.5 * IQR))].shape[0]
     }
 
-# Terminalde Okunabilir Tablo Çıktısı
+# Terminal-Readable Table Output
 stats_df = pd.DataFrame(advanced_stats).T
 print("📊 ADVANCED STATISTICAL SUMMARY")
 print("-" * 60)
-print(stats_df.to_string()) # to_string() tüm tabloyu düzgünce hizalar
+print(stats_df.to_string()) # to_string() aligns the entire table neatly
 print("-" * 60 + "\n")
 
 df.to_csv("cleaned_dataset.csv", index=False)

@@ -4,8 +4,8 @@ import seaborn as sns
 from docx import Document
 from docx.shared import Inches, Pt
 
-# Görsel ayarlar (Okunabilir yazı tipi boyutları)
-sns.set_context("talk") # Yazıları daha büyük ve okunur yapar
+#Visual settings (Readable font sizes)
+sns.set_context("talk") # Makes text larger and more readable
 plt.rcParams['axes.titlesize'] = 16
 
 def add_spacer(doc):
@@ -15,7 +15,7 @@ def create_report():
     df = pd.read_csv("cleaned_dataset.csv")
     doc = Document()
     
-    # Rapor Başlığı
+   # Report Title
     title = doc.add_heading('DATA ANALYSIS EXECUTIVE REPORT', 0)
     title.alignment = 1 # Center alignment
     
@@ -40,7 +40,7 @@ def create_report():
                           "The wider sections of the violin represent a higher probability of data points.")
         doc.add_page_break() # Her grafikten sonra yeni sayfaya geç
 
-        # --- SECTION 2: CORRELATIONS (TABLO EKLEME) ---
+        # --- SECTION 2: CORRELATIONS (ADD TABLE) ---
         doc.add_heading('2. Correlation Insights', level=1)
         if len(num_cols) > 1:
             plt.figure(figsize=(8, 6))
